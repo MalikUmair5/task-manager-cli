@@ -1,12 +1,6 @@
 import json
 import os
 
-
-
-
-
-
-
 TASKS_FILE = "tasks.json"
 
 
@@ -33,29 +27,47 @@ def add_tasks(title):
         return False
     
 def remove_task(id):
- #   print("Task Removed Successfully")
-    print(tasks[id -1])
-    tasks.pop(id - 1)
-    save_tasks()
-    
+    if id < 1 or id > len(tasks):
+        print("Invalid Task  Please enter a valid task Number")
+        return
+    try: 
+        removed_task = tasks.pop(id - 1)
+        if(save_tasks()):
+            print(f"Task {removed_task} Deleted Successfully")
+        else:
+            print("Cannot Save the Task")
+    except Exception as e:
+        print(f"Cannot Complete Task due to {e}")
 
 def show_all_tasks():
+    if not tasks:
+        print("No Tasks are available")
+        return
     i = 1
+    print("\n")
     for task in tasks:
         print(f"{i}) {task["Title"]} [{task["Status"]}]")
         i += 1
+    print("\n")
 
-
+def mark_as_done(id):
+    try:
+        tasks[id -1]["Status"] = "Completed"
+        if save_tasks():
+            print("Task Saved Successfully")
+        else: 
+            print("Connot Save the task")
+    except Exception as e:
+        print(f"Cannot Mark as done due to {e}")
 
 def save_tasks():
     try:
         with open(TASKS_FILE, "w") as file:
             json.dump(tasks, file, indent=4)
             return True
-    except Exception:
-        print(f"Error Saving Tasks {Exception}")
+    except Exception as e:
+        print(f"Error Saving Tasks {e}")
         return False
-
 
 
 
@@ -89,9 +101,26 @@ while True:
                 print("\n")
                 show_all_tasks()
                 print("\n")
-                id = int(input("Enter Task Number To Delete: "))
-                remove_task(id)
+                try:
+                    id = int(input("Enter Task Number To Delete: "))
+                    remove_task(id)
+                except ValueError:
+                    print("Please Enter a valid Input")
                 print("\n")
+
+            elif selected_Option == 3:
+                print("\n")
+                show_all_tasks()
+                print("\n")
+                try:
+                    id = int(input("Enter Task Number To Mark as Done: "))
+                    mark_as_done(id)
+                except ValueError:
+                    print("Please Enter a valid input")
+                print("\n")
+
+            elif selected_Option == 4:
+                show_all_tasks()
             elif selected_Option == 5:
                 break
         else:
